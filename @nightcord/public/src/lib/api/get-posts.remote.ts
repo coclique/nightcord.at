@@ -61,6 +61,8 @@ export const getPosts = query(
       }
     }
 
+    sampledPosts = sampledPosts.slice(0, maxEntries)
+
     const selectedIds = sampledPosts.map((p) => p.id)
     console.log('Sampled post IDs:', selectedIds)
 
@@ -71,6 +73,6 @@ export const getPosts = query(
       .set({ loads: sql`${posts.loads} + 1` })
       .where(inArray(posts.id, selectedIds))
 
-    return sampledPosts.slice(0, maxEntries).map(makePostView)
+    return sampledPosts.map(makePostView)
   },
 )
