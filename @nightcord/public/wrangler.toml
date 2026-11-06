@@ -38,6 +38,9 @@ namespace_id = "2"
 limit = 5
 period = 10
 
+[ai]
+binding = "AI"
+
 [vars]
 N25_PUBLIC_DEPLOYMENT_ENV = "production"
 N25_PUBLIC_CF_TURNSTILE_SITEKEY = "0x4AAAAAABzvp9Ei968n3hWk"
