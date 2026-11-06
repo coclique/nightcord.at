@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "@fontsource-variable/eb-garamond": "catalog:",
-    "@huggingface/inference": "catalog:",
     "@inlang/paraglide-js": "catalog:",
     "@libsql/client": "catalog:",
     "@lucide/svelte": "catalog:",

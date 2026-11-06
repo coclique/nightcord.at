@@ -1,7 +1,7 @@
-import { N25_OPENAI_APIKEY, N25_HF_APIKEY } from '$app/env/private'
+import { N25_OPENAI_APIKEY } from '$app/env/private'
 import { singleton } from '@/lib/util'
-import { InferenceClient } from '@huggingface/inference'
 import OpenAI from 'openai'
+import { env } from 'cloudflare:workers'
 
 export type RejectVerdict = 'policy-reject' | 'hard-reject'
 export type ModerationFlag = keyof OpenAI.Moderation.Categories
@@ -11,7 +11,6 @@ export type TextAnalysis =
   | { verdict: RejectVerdict; reasons: ModerationFlag[] }
 
 const openai = singleton(() => new OpenAI({ apiKey: N25_OPENAI_APIKEY }))
-const hf = singleton(() => new InferenceClient(N25_HF_APIKEY))
 
 const hardRejectCategories: ModerationFlag[] = [
   'sexual/minors',
@@ -74,22 +73,45 @@ export async function analyzeTextModeration(content: string): Promise<TextAnalys
   }
 }
 
+type DecisionModelAnswer =
+  | { type: 'noul'; noul: number }
+  | { type: 'choice'; choice: string; probabilities: Record<string, number>; confidence: number }
+  | {
+      type: 'score'
+      score: number
+      legend: Record<string, string>
+      probabilities: Record<string, number>
+      confidence: number
+    }
+
+interface DecisionModelOutput {
+  model: string
+  answers: Record<string, DecisionModelAnswer>
+  usage: { input_tokens: number; output_tokens: number }
+}
+
 export async function analyzeTextSentiment(content: string): Promise<number> {
   try {
-    const result = await hf().textClassification({
-      provider: 'hf-inference',
-      model: 'distilbert-base-uncased-finetuned-sst-2-english',
-      inputs: content,
-    })
-    return result[0].label === 'POSITIVE' ? result[0].score : -result[0].score
+    const result = (await env.AI.run('@cf/cloudflare/clef-flash', {
+      model: 'clef-flash',
+      state: content,
+      questions: {
+        sentiment: {
+          type: 'score',
+          instructions: 'What is the overall sentiment of this text?',
+          criteria: ['negative', 'neutral', 'positive'],
+        },
+      },
+    })) as unknown as DecisionModelOutput
+
+    if (result.answers['sentiment'].type !== 'score')
+      throw new Error('Unexpected answer type from Workers AI: ' + result.answers['sentiment'].type)
+
+    return result.answers['sentiment'].score - 1
   } catch (error) {
     // If the sentiment analysis fails, we don't want to reject the post outright, so we just log
     // the error and return a neutral sentiment
-    console.error(
-      'Error calling Hugging Face Inference API:',
-      error,
-      'defaulting to neutral sentiment',
-    )
+    console.error('Error calling Workers AI binding:', error, 'defaulting to neutral sentiment')
     return 0
   }
 }

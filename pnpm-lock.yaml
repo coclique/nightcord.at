@@ -170,9 +170,6 @@ catalogs:
     '@fontsource-variable/eb-garamond':
       specifier: ^5.3.0
       version: 5.3.0
-    '@huggingface/inference':
-      specifier: ^4.13.32
-      version: 4.13.32
     '@inlang/paraglide-js':
       specifier: ^3.1.0
       version: 3.1.0
@@ -313,9 +310,6 @@ importers:
       '@fontsource-variable/eb-garamond':
         specifier: 'catalog:'
         version: 5.3.0
-      '@huggingface/inference':
-        specifier: 'catalog:'
-        version: 4.13.32
       '@inlang/paraglide-js':
         specifier: 'catalog:'
         version: 3.1.0(typescript@6.0.3)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
@@ -1022,17 +1016,6 @@ packages:
 
   '@fontsource-variable/eb-garamond@5.3.0':
     resolution: {integrity: sha512-656OJsA9Vv24yhqRZFEzXnzS2AYgKdEILLgHJYLzzXndgcWFKfSXFqzbRI5/6Yk1Yt7UfWrUeppE5nRQPQMwlQ==}
-
-  '@huggingface/inference@4.13.32':
-    resolution: {integrity: sha512-8ciIAPAV+Ck/om1PkvQ+flogKcoi6XEs4MDuwX9HeaYfmPdF1ooWXLsYo0wU5fRwxiYkqPaN4TuDUBXed3ywIA==}
-    engines: {node: '>=18'}
-
-  '@huggingface/jinja@0.5.11':
-    resolution: {integrity: sha512-YzEzwM5oQf4r0vs7ifWQ+yuVR1YkAHrjERQ+a8WRsStHHp4NRBg+NesjiFc+X2AFUpRvvrIeHDS1xFy9jY/IjQ==}
-    engines: {node: '>=18'}
-
-  '@huggingface/tasks@0.21.61':
-    resolution: {integrity: sha512-bAki2SyAkxYbzYCAcOmPYq++CzCHI1CkxeVQnF2jkXAh60wnIuR+jZJ+Eha1aaI049bB1aO8H+icr4C/kvLnuw==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -2931,15 +2914,6 @@ snapshots:
   '@floating-ui/utils@0.2.12': {}
 
   '@fontsource-variable/eb-garamond@5.3.0': {}
-
-  '@huggingface/inference@4.13.32':
-    dependencies:
-      '@huggingface/jinja': 0.5.11
-      '@huggingface/tasks': 0.21.61
-
-  '@huggingface/jinja@0.5.11': {}
-
-  '@huggingface/tasks@0.21.61': {}
 
   '@img/colour@1.1.0': {}
 
