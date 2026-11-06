@@ -1,13 +1,12 @@
 <script lang="ts">
 import { onDestroy, onMount } from 'svelte'
 import * as _3 from 'three'
-
-import background from '$lib/assets/empty-sekai.png'
-import { browser } from '$app/environment'
+import background from '@/lib/assets/empty-sekai.png'
+import { browser } from '$app/env'
 import { on } from 'svelte/events'
-import { Fragment } from '$lib/fragment'
+import { Fragment } from '@/lib/fragment'
 import { animate } from 'animejs'
-import { clientHeight, clientWidth } from '$lib/util'
+import { clientHeight, clientWidth } from '@/lib/util'
 
 interface Props {
   count: number
@@ -133,11 +132,7 @@ onMount(() => {
   scene.add(group)
 
   camera = new _3.PerspectiveCamera(/*fov=*/ 105, /*aspect=*/ 1.0, /*near=*/ 0.01, /*far=*/ 200)
-  renderer = new _3.WebGLRenderer({
-    canvas: renderTarget,
-    antialias: true,
-    alpha: true,
-  })
+  renderer = new _3.WebGLRenderer({ canvas: renderTarget, antialias: true, alpha: true })
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = _3.VSMShadowMap
 
@@ -173,8 +168,7 @@ function updateIntersection() {
   newIntersect = intersects
     .map((i) => i.object)
     .find((obj) => obj instanceof _3.Mesh && obj.material instanceof _3.MeshPhysicalMaterial) as
-    | _3.Mesh
-    | undefined
+    _3.Mesh | undefined
 
   if (newIntersect !== mouseover) {
     if (mouseover) {

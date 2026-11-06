@@ -1,8 +1,9 @@
 import { command, getRequestEvent } from '$app/server'
 import z from 'zod'
-import { getRateLimitKey } from '$lib/server/util'
+import { getRateLimitKey } from '@/lib/server/util'
 import { posts } from '@nightcord/shared/db/schema'
 import { eq, sql } from 'drizzle-orm'
+import { env } from 'cloudflare:workers'
 
 export const recordView = command(
   z.object({
@@ -14,7 +15,7 @@ export const recordView = command(
     const { locals, getClientAddress } = getRequestEvent()
     const ip = getClientAddress()
 
-    const { success } = await locals.viewRateLimiter.limit({ key: getRateLimitKey(ip) })
+    const { success } = await env.VIEW_RATE_LIMITER.limit({ key: getRateLimitKey(ip) })
     if (!success) {
       console.warn(`View rate limit exceeded for IP ${ip}`)
       return // Don't block the view, just don't record it

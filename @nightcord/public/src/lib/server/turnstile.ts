@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private'
+import { N25_CF_TURNSTILE_SECRET } from '$app/env/private'
 import z from 'zod'
 
 const zTurnstileApiResponse = z.object({
@@ -12,7 +12,7 @@ export async function validateTurnstile(token: string, ip: string | null): Promi
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        secret: env.N25_CF_TURNSTILE_SECRET,
+        secret: N25_CF_TURNSTILE_SECRET,
         response: token,
         remoteip: ip,
       }),

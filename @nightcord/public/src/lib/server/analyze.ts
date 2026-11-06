@@ -1,5 +1,5 @@
-import { env } from '$env/dynamic/private'
-import { singleton } from '$lib/util'
+import { N25_OPENAI_APIKEY, N25_HF_APIKEY } from '$app/env/private'
+import { singleton } from '@/lib/util'
 import { InferenceClient } from '@huggingface/inference'
 import OpenAI from 'openai'
 
@@ -10,8 +10,8 @@ export type TextAnalysis =
   | { verdict: 'accept'; flags: ModerationFlag[] }
   | { verdict: RejectVerdict; reasons: ModerationFlag[] }
 
-const openai = singleton(() => new OpenAI({ apiKey: env.N25_OPENAI_APIKEY }))
-const hf = singleton(() => new InferenceClient(env.N25_HF_APIKEY))
+const openai = singleton(() => new OpenAI({ apiKey: N25_OPENAI_APIKEY }))
+const hf = singleton(() => new InferenceClient(N25_HF_APIKEY))
 
 const hardRejectCategories: ModerationFlag[] = [
   'sexual/minors',

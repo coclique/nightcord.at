@@ -1,8 +1,8 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index 08dd84044224ad57e10b3edbe7dcaf3a99c89341..27d9d98c78e94664f9e26ac553e17ac408d91c14 100644
+index 4dc5bcedc5dc72dabb37a3da0a98bbaa05321a8a..476321958996e08016abab5dc037a80d6e944870 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
-@@ -9006,7 +9006,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9064,7 +9064,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  
  					if ( light.isPointLight ) {
  

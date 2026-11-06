@@ -1,11 +1,11 @@
 <script lang="ts">
 import { Turnstile } from 'svelte-turnstile'
-import { N25_PUBLIC_CF_TURNSTILE_SITEKEY, N25_PUBLIC_DEPLOYMENT_ENV } from '$env/static/public'
-import { submitPost } from '$lib/api/submit-post.remote'
-import { getPosts, type PostView } from '$lib/api/get-posts.remote'
+import { N25_PUBLIC_CF_TURNSTILE_SITEKEY, N25_PUBLIC_DEPLOYMENT_ENV } from '$app/env/public'
+import { submitPost } from '@/lib/api/submit-post.remote'
+import { getPosts, type PostView } from '@/lib/api/get-posts.remote'
 import type { TurnstileObject } from 'turnstile-types'
-import Fragments from '$lib/components/fragments.svelte'
-import { Fragment } from '$lib/fragment'
+import Fragments from '@/lib/components/fragments.svelte'
+import { Fragment } from '@/lib/fragment'
 import * as _3 from 'three'
 import { Dialog, Popover } from 'bits-ui'
 
@@ -20,12 +20,13 @@ import {
   Heart,
   Quote,
   PenTool,
-} from 'lucide-svelte'
+} from '@lucide/svelte'
+
 import { onMount, type Component } from 'svelte'
 import { toast } from 'svelte-sonner'
-import { recordView } from '$lib/api/record-view.remote'
-import { clientHeight, clientWidth, cn, randomSelect } from '$lib/util'
-import { blackbodyColor, toCssString } from '$lib/black-body'
+import { recordView } from '@/lib/api/record-view.remote'
+import { clientHeight, clientWidth, cn, randomSelect } from '@/lib/util'
+import { blackbodyColor, toCssString } from '@/lib/black-body'
 
 let nickname = $state('')
 let message = $state('')
@@ -58,11 +59,7 @@ async function initiateSubmit() {
 async function finishSubmit(turnstileToken: string) {
   try {
     turnstile?.reset(widgetId!)
-    const result = await submitPost({
-      nickname,
-      content: message,
-      turnstileToken,
-    })
+    const result = await submitPost({ nickname, content: message, turnstileToken })
 
     if (!result.success) {
       toast.error(result.error ?? 'Failed to submit your message. Please try again later.')
@@ -190,10 +187,8 @@ const shouldShowTurnstile = $derived(turnstileIsActive && postDialogOpen)
 >
   <button
     class="pointer-events-auto m-0.5 rounded-full p-5.5 outline-white hover:cursor-pointer focus-visible:outline-2"
-    onclick={() => (postDialogOpen = true)}
+    onclick={() => (postDialogOpen = true)}><Plus class="size-12" /></button
   >
-    <Plus class="size-12" />
-  </button>
 </div>
 
 <!-- Message submission overlay -->

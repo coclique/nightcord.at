@@ -8,18 +8,10 @@ declare global {
     // interface Error {}
     interface Locals {
       db: Database
-      postRateLimiter: RateLimit
-      viewRateLimiter: RateLimit
-      workerCtx: ExecutionContext
-      cf: IncomingRequestCfProperties
     }
     // interface PageData {}
     // interface PageState {}
-    interface Platform {
-      env: Env
-      ctx: ExecutionContext
-      cf: IncomingRequestCfProperties
-    }
+    // interface Platform {}
   }
 }
 

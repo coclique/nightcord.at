@@ -1,16 +1,15 @@
 import { command, getRequestEvent } from '$app/server'
 import z from 'zod'
-
-import { analyzeTextModeration, analyzeTextSentiment } from '$lib/server/analyze'
+import { analyzeTextModeration, analyzeTextSentiment } from '@/lib/server/analyze'
 import { posts } from '@nightcord/shared/db/schema'
-import { N25_PUBLIC_DEPLOYMENT_ENV } from '$env/static/public'
-import { getRateLimitKey } from '$lib/server/util'
-import { validateTurnstile } from '$lib/server/turnstile'
+import { N25_PUBLIC_DEPLOYMENT_ENV } from '$app/env/public'
+import { getRateLimitKey } from '@/lib/server/util'
+import { validateTurnstile } from '@/lib/server/turnstile'
 import type { NewPostRow } from '@nightcord/shared/db'
+import { env, waitUntil } from 'cloudflare:workers'
 
 export type SubmitPostResult =
-  | { success: true; crisisResources: boolean }
-  | { success: false; error: string }
+  { success: true; crisisResources: boolean } | { success: false; error: string }
 
 async function validateAndStore(validate: Promise<boolean>, row: NewPostRow) {
   if (!(await validate)) {
@@ -35,13 +34,11 @@ export const submitPost = command(
   async ({ nickname: rawNickname, content, turnstileToken }): Promise<SubmitPostResult> => {
     console.log('Received post submission:', { rawNickname, content, turnstileToken })
 
-    const { locals, getClientAddress, request } = getRequestEvent()
+    const { getClientAddress, request } = getRequestEvent()
     const ip = getClientAddress()
     const nickname = rawNickname.trim() || null
+    const { success } = await env.POST_RATE_LIMITER.limit({ key: getRateLimitKey(ip) })
 
-    const { success } = await locals.postRateLimiter.limit({
-      key: getRateLimitKey(ip),
-    })
     if (!success) {
       console.error(`Rate limit exceeded for IP ${ip}, rejecting`)
       return {
@@ -68,15 +65,16 @@ export const submitPost = command(
 
     let inferredSelfHarmIntent = analysis.flags.includes('self-harm/intent')
 
-    locals.workerCtx.waitUntil(
+    const cf = request.cf as IncomingRequestCfProperties | undefined
+    waitUntil(
       validateAndStore(turnstilePromise, {
         nickname,
         content,
         authorIp: ip,
         authorUserAgent: request.headers.get('user-agent') ?? null,
-        authorCity: locals.cf.city ?? 'Unknown',
-        authorRegion: locals.cf.region ?? 'Unknown',
-        authorCountry: locals.cf.country ?? 'ZZ',
+        authorCity: cf?.city ?? 'Unknown',
+        authorRegion: cf?.region ?? 'Unknown',
+        authorCountry: cf?.country ?? 'ZZ',
         inferredSelfHarmIntent,
       }),
     )

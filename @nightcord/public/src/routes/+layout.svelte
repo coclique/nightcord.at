@@ -1,8 +1,8 @@
 <script lang="ts">
 import '@fontsource-variable/eb-garamond'
 import '@fontsource-variable/eb-garamond/wght-italic.css'
-import '../app.css'
-import banner from '$lib/assets/empty-sekai.png'
+import '@/app.css'
+import banner from '@/lib/assets/empty-sekai.png'
 import { Toaster } from 'svelte-sonner'
 
 let { children } = $props()
