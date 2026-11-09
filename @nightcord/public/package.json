@@ -17,6 +17,7 @@
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@types/three": "catalog:",
+    "remeda": "catalog:",
     "svelte-check": "catalog:",
     "turnstile-types": "catalog:",
     "vite": "catalog:",

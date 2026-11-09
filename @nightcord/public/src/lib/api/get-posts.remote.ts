@@ -3,6 +3,7 @@ import type { PostRow } from '@nightcord/shared/db'
 import { posts } from '@nightcord/shared/db/schema'
 import { inArray, max, sql } from 'drizzle-orm'
 import z from 'zod'
+import { chunk } from 'remeda'
 
 export type PostView = ReturnType<typeof makePostView>
 
@@ -21,6 +22,8 @@ function makePostView(post: PostRow) {
     inferredSelfHarmIntent: post.inferredSelfHarmIntent,
   }
 }
+
+const CHUNK_SIZE = 50
 
 export const getPosts = query(
   z.object({
@@ -42,8 +45,10 @@ export const getPosts = query(
         .limit(maxEntries)
     } else {
       // Sample 2 rounds max, give up after that
-      for (let i = 0; i < 2; i++) {
-        const sampleIds = new Array(nSamples)
+      const rounds = 2 * Math.ceil(maxEntries / CHUNK_SIZE)
+
+      for (let i = 0; i < rounds; i++) {
+        const sampleIds = new Array(CHUNK_SIZE)
           .fill(null)
           .map(() => Math.floor(Math.random() * maxId) + 1)
 
@@ -54,7 +59,7 @@ export const getPosts = query(
             .from(posts)
             .where(inArray(posts.id, sampleIds))
             .orderBy(sql`random()`)
-            .limit(maxEntries)),
+            .limit(CHUNK_SIZE)),
         )
 
         if (sampledPosts.length >= maxEntries) break
@@ -68,10 +73,12 @@ export const getPosts = query(
 
     // Update load counts for the sampled posts. Maybe use an asynchronous approach in the future
     // if this turns out to be a bottleneck.
-    await locals.db
-      .update(posts)
-      .set({ loads: sql`${posts.loads} + 1` })
-      .where(inArray(posts.id, selectedIds))
+    for (const selectIdChunk of chunk(selectedIds, CHUNK_SIZE)) {
+      await locals.db
+        .update(posts)
+        .set({ loads: sql`${posts.loads} + 1` })
+        .where(inArray(posts.id, selectIdChunk))
+    }
 
     return sampledPosts.map(makePostView)
   },
